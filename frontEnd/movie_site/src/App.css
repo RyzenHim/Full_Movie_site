@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.animate-shimmer {
+    animation: shimmer 1.6s infinite linear;
+}
+
+/* 🌙 Dark Theme */
+html.dark {
+    --bg: #0b0b0d;
+    --card: #141417;
+    --text: #ffffff;
+    --soft-text: rgba(255, 255, 255, 0.7);
+    --accent: #3b82f6;
+}
+
+/* ☀️ Light Theme */
+html.light {
+    --bg: #f5f7fa;
+    --card: #ffffff;
+    --text: #1f1f1f;
+    --soft-text: rgba(0, 0, 0, 0.6);
+    --accent: #2563eb;
+}
+
+/* Apply background */
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    transition: background 0.3s ease, color 0.3s ease;
+}
