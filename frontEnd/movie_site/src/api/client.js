@@ -1,5 +1,4 @@
 import axios from "axios";
-
 export const api = axios.create({
-    baseURL: "https://full-movie-site.onrender.com", // your Mongo backend
+    baseURL: "https://full-movie-site-backend.onrender.com", // correct API backend
 });
