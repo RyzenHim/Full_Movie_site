@@ -1,4 +1,4 @@
-// backend/index.js
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -12,7 +12,7 @@ const app = express();
 
 app.use(
     cors({
-        origin: "http://localhost:5173",
+        origin: "https://movie-site-frontend-vn43.onrender.com/",
         credentials: true,
     })
 );
@@ -20,7 +20,7 @@ app.use(
 app.use(express.json());
 
 const MONGO_URI =
-    process.env.MONGO_URI || "mongodb://127.0.0.1:27017/full_movie_site";
+    process.env.MONGO_URI;
 
 mongoose
     .connect(MONGO_URI)

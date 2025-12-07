@@ -4,7 +4,7 @@ export const moviesApi = createApi({
     reducerPath: "moviesApi",
 
     baseQuery: fetchBaseQuery({
-        baseUrl: "http://localhost:3000/api/",
+        baseUrl: import.meta.env.VITE_API_URL,
     }),
 
     tagTypes: ["Movies", "Movie", "Reviews"],
@@ -34,12 +34,8 @@ export const moviesApi = createApi({
                 method: "POST",
                 body: review,
             }),
-            invalidatesTags: (result, error, { id }) => [
-                { type: "Movie", id },
-                "Reviews",
-            ],
+            invalidatesTags: ["Movies", "Movie", "Reviews"],
         }),
-
     }),
 });
 

@@ -7,7 +7,7 @@ const {
     addReview,
 } = require("../controllers/movieController");
 
-const Movie = require("../models/Movie"); // ⭐ REQUIRED for search
+const Movie = require("../models/Movie");
 
 router.get("/search", async (req, res) => {
     try {

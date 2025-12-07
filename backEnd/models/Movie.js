@@ -5,15 +5,15 @@ const MovieSchema = new mongoose.Schema(
         title: String,
         year: Number,
         genres: [String],
-        runtime: Number, // in minutes
+        runtime: Number,
         language: String,
         countries: [String],
-        ageRating: String, // Rated
+        ageRating: String,
         imdbId: String,
         imdbRating: Number,
         imdbVotes: Number,
-        rating: Number, // copy of imdbRating for your own usage
-        voteCount: Number, // copy of imdbVotes
+        rating: Number,
+        voteCount: Number,
 
         overview: String,
         tagline: String,
@@ -28,7 +28,6 @@ const MovieSchema = new mongoose.Schema(
         productionCompanies: [String],
         releasedDate: Date,
 
-        // you can use these for sections (Trending, Popular, etc.)
         isTrending: { type: Boolean, default: false },
         isTopRated: { type: Boolean, default: false },
     },
