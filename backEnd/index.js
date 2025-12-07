@@ -10,11 +10,15 @@ const moviesRoutes = require("./routes/moviesRoutes");
 
 const app = express();
 
+
 app.use(
-    cors({
-        origin: "https://movie-site-frontend-vn43.onrender.com/",
-        credentials: true,
-    })
+  cors({
+    origin: [
+      "http://localhost:5174",
+      "https://movie-site-frontend-vn43.onrender.com"
+    ],
+    credentials: true,
+  })
 );
 
 app.use(express.json());
