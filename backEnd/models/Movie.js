@@ -27,7 +27,6 @@ const MovieSchema = new mongoose.Schema(
         cast: [String],
         productionCompanies: [String],
         releasedDate: Date,
-
         isTrending: { type: Boolean, default: false },
         isTopRated: { type: Boolean, default: false },
     },
