@@ -12,7 +12,7 @@ const app = express();
 
 app.use(
     cors({
-        origin: "https://movie-site-frontend-vn43.onrender.com",
+        origin: "https://movie-site-frontend-vn43.onrender.com/",
         credentials: true,
     })
 );
