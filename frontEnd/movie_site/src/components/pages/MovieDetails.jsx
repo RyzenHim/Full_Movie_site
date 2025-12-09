@@ -9,10 +9,8 @@ export default function MovieDetails() {
     const { id } = useParams();
 
     const { data: movie, isLoading } = useGetMovieByIdQuery(id);
-
     const { data: allMovies = [] } = useGetMoviesQuery({});
 
-    // ⭐ SHIMMER LOADING FOR HERO
     if (isLoading || !movie) {
         return <SkeletonHero />;
     }
@@ -22,7 +20,11 @@ export default function MovieDetails() {
     );
 
     return (
-        <div className="min-h-screen text-white bg-[#0B0B0D]">
+        <div className="min-h-screen text-white relative">
+
+            {/* Background gradient */}
+            <div className="fixed inset-0 -z-20 bg-gradient-to-br from-[#050509] via-[#050712] to-[#0b0b0d]" />
+            <div className="fixed inset-0 -z-10 opacity-40 bg-[radial-gradient(circle_at_top,_#3b82f6_0,_transparent_55%)]" />
 
             {/* Backdrop Banner */}
             <div className="relative w-full h-[70vh] overflow-hidden">
@@ -31,74 +33,118 @@ export default function MovieDetails() {
                     alt={movie.title}
                     className="w-full h-full object-cover opacity-60"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/75 to-transparent" />
 
-                <div className="absolute bottom-20 left-16 max-w-3xl space-y-6">
-                    <h1 className="text-6xl font-extrabold drop-shadow-xl">{movie.title}</h1>
+                {/* Glass info panel over banner */}
+                <div className="absolute bottom-16 left-6 sm:left-12 max-w-3xl">
+                    <div className="bg-black/55 backdrop-blur-2xl border border-white/15 rounded-3xl p-6 sm:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.9)]">
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold drop-shadow-xl">
+                            {movie.title}
+                        </h1>
 
-                    <div className="flex gap-5 text-gray-300 text-lg font-medium">
-                        <span>{movie.year}</span>
-                        <span>•</span>
-                        <span>{movie.ageRating}</span>
-                        <span>•</span>
-                        <span>{movie.runtime} min</span>
-                        <span>•</span>
-                        <span className="text-yellow-400 font-semibold">⭐ {movie.imdbRating}</span>
-                    </div>
+                        <div className="flex flex-wrap gap-3 text-gray-300 text-sm sm:text-base font-medium mt-4">
+                            <span>{movie.year}</span>
+                            <span>•</span>
+                            <span>{movie.ageRating}</span>
+                            <span>•</span>
+                            <span>{movie.runtime} min</span>
+                            <span>•</span>
+                            <span className="text-yellow-400 font-semibold">
+                                ⭐ {movie.imdbRating}
+                            </span>
+                        </div>
 
-                    <div className="flex gap-4 mt-2">
-                        <button className="flex items-center gap-2 bg-white text-black px-8 py-3 rounded-xl text-lg font-bold shadow hover:bg-gray-300">
-                            <FaPlay /> Watch Now
-                        </button>
+                        <p className="mt-4 text-gray-200 text-sm sm:text-base line-clamp-3">
+                            {movie.plot}
+                        </p>
 
-                        <button className="flex items-center gap-2 bg-black/60 px-8 py-3 rounded-xl border border-white/30 hover:bg-black/80">
-                            <FaPlus /> Add to List
-                        </button>
+                        <div className="flex flex-wrap gap-3 mt-4">
+                            {movie.genres.map((g) => (
+                                <span
+                                    key={g}
+                                    className="px-3 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs sm:text-sm tracking-wide"
+                                >
+                                    {g}
+                                </span>
+                            ))}
+                        </div>
+
+                        <div className="flex flex-wrap gap-4 mt-6">
+                            <button className="flex items-center gap-2 bg-white text-black px-6 sm:px-8 py-3 rounded-xl text-sm sm:text-lg font-bold shadow hover:bg-gray-200 transition">
+                                <FaPlay /> Watch Now
+                            </button>
+
+                            <button className="flex items-center gap-2 bg-black/60 px-6 sm:px-8 py-3 rounded-xl border border-white/30 hover:bg-black/80 text-sm sm:text-lg transition">
+                                <FaPlus /> Add to List
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
             {/* Content */}
-            <div className="px-16 py-16 space-y-14">
+            <div className="px-4 sm:px-8 lg:px-16 py-12 space-y-14">
 
-                {/* Plot */}
-                <div className="grid grid-cols-3 gap-14">
-                    <div className="col-span-2 space-y-6">
-                        <h2 className="text-3xl font-bold">Storyline</h2>
-                        <p className="text-gray-300 text-lg leading-relaxed">{movie.plot}</p>
+                {/* Story + Info */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-14">
 
-                        <div className="flex gap-4 flex-wrap mt-4">
-                            {movie.genres.map((g) => (
-                                <span key={g} className="px-4 py-1.5 rounded-xl bg-white/10 border border-white/20 text-sm">
-                                    {g}
-                                </span>
-                            ))}
+                    {/* Storyline */}
+                    <div className="lg:col-span-2">
+                        <div className="bg-white/5 backdrop-blur-2xl border border-white/15 rounded-3xl p-6 sm:p-8 shadow-[0_18px_45px_rgba(0,0,0,0.6)]">
+                            <h2 className="text-2xl sm:text-3xl font-bold mb-4">
+                                Storyline
+                            </h2>
+                            <p className="text-gray-200 text-sm sm:text-lg leading-relaxed">
+                                {movie.plot}
+                            </p>
                         </div>
                     </div>
 
-                    {/* Metadata */}
-                    <div className="space-y-4 text-gray-300">
-                        <h3 className="text-xl font-semibold text-white">Movie Info</h3>
+                    {/* Movie Info */}
+                    <div>
+                        <div className="bg-white/5 backdrop-blur-2xl border border-white/15 rounded-3xl p-6 sm:p-7 shadow-[0_18px_45px_rgba(0,0,0,0.6)] space-y-3 text-gray-200 text-sm sm:text-base">
+                            <h3 className="text-xl font-semibold text-white mb-2">
+                                Movie Info
+                            </h3>
 
-                        <p><span className="text-white font-semibold">Language:</span> {movie.language}</p>
-                        <p><span className="text-white font-semibold">Countries:</span> {movie.countries.join(", ")}</p>
-                        <p><span className="text-white font-semibold">IMDB Votes:</span> {movie.imdbVotes}</p>
-                        <p><span className="text-white font-semibold">Directors:</span> {movie.directors.join(", ")}</p>
-                        <p><span className="text-white font-semibold">Writers:</span> {movie.writers.join(", ")}</p>
-                        <p><span className="text-white font-semibold">Production:</span> {movie.productionCompanies.join(", ")}</p>
+                            <p>
+                                <span className="text-white font-semibold">Language: </span>
+                                {movie.language}
+                            </p>
+                            <p>
+                                <span className="text-white font-semibold">Countries: </span>
+                                {movie.countries.join(", ")}
+                            </p>
+                            <p>
+                                <span className="text-white font-semibold">IMDB Votes: </span>
+                                {movie.imdbVotes}
+                            </p>
+                            <p>
+                                <span className="text-white font-semibold">Directors: </span>
+                                {movie.directors.join(", ")}
+                            </p>
+                            <p>
+                                <span className="text-white font-semibold">Writers: </span>
+                                {movie.writers.join(", ")}
+                            </p>
+                            <p>
+                                <span className="text-white font-semibold">Production: </span>
+                                {movie.productionCompanies.join(", ")}
+                            </p>
+                        </div>
                     </div>
                 </div>
 
                 {/* Cast */}
                 {movie.cast.length > 0 && (
                     <div>
-                        <h2 className="text-3xl font-bold mb-6">Cast</h2>
+                        <h2 className="text-2xl sm:text-3xl font-bold mb-4">Cast</h2>
 
                         <div className="flex gap-6 overflow-x-auto no-scrollbar py-2">
                             {movie.cast.map((actor, i) => (
                                 <div
                                     key={i}
-                                    className="min-w-[160px] h-28 bg-white/10 border border-white/10 rounded-xl flex items-center justify-center text-lg font-medium"
+                                    className="min-w-[150px] h-24 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-sm sm:text-lg font-medium text-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
                                 >
                                     {actor}
                                 </div>
@@ -109,12 +155,17 @@ export default function MovieDetails() {
 
                 {/* Similar Movies */}
                 {similar.length > 0 && (
-                    <MovieStrip title="Similar Movies" movies={similar} />
+                    <div className="space-y-4">
+                        <h2 className="text-2xl sm:text-3xl font-bold">Similar Movies</h2>
+                        <MovieStrip title="You may also like" movies={similar} />
+                    </div>
                 )}
-
             </div>
-            <ReviewsSection reviews={movie.comments} movieId={movie._id} />
 
+            {/* Reviews Section */}
+            <div className="px-4 sm:px-8 lg:px-16 pb-16">
+                <ReviewsSection reviews={movie.comments} movieId={movie._id} />
+            </div>
         </div>
     );
 }

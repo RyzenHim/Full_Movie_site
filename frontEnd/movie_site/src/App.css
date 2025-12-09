@@ -38,3 +38,134 @@ body {
     color: var(--text);
     transition: background 0.3s ease, color 0.3s ease;
 }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 10px;
+}
+
+@keyframes heroZoom {
+    0% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(1.15);
+    }
+}
+
+.animate-heroZoom {
+    animation: heroZoom 5s ease-in-out forwards;
+}
+
+
+
+
+/* =============================
+   CYBERPUNK NEON SCROLLBAR
+   Blue → Purple glow
+============================= */
+
+.cyberpunk-scrollbar::-webkit-scrollbar {
+    height: 8px;
+    /* horizontal scrollbar */
+}
+
+.cyberpunk-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.45);
+    border-radius: 10px;
+    border: 1px solid rgba(0, 217, 255, 0.25);
+    backdrop-filter: blur(12px);
+    box-shadow: inset 0 0 10px rgba(0, 200, 255, 0.15);
+}
+
+.cyberpunk-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, #00eaff, #6f00ff);
+    border-radius: 10px;
+    border: 2px solid rgba(0, 0, 0, 0.6);
+    box-shadow:
+        0 0 10px rgba(0, 200, 255, 0.7),
+        0 0 20px rgba(111, 0, 255, 0.7);
+    animation: glowPulse 2s infinite ease-in-out;
+}
+
+.cyberpunk-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(90deg, #33f3ff, #9b33ff);
+    box-shadow:
+        0 0 15px rgba(0, 255, 255, 0.9),
+        0 0 25px rgba(140, 0, 255, 0.9);
+}
+
+/* Pulse animation */
+@keyframes glowPulse {
+    0% {
+        box-shadow:
+            0 0 10px rgba(0, 200, 255, 0.8),
+            0 0 20px rgba(111, 0, 255, 0.8);
+    }
+
+    50% {
+        box-shadow:
+            0 0 18px rgba(0, 255, 255, 1),
+            0 0 30px rgba(160, 0, 255, 1);
+    }
+
+    100% {
+        box-shadow:
+            0 0 10px rgba(0, 200, 255, 0.8),
+            0 0 20px rgba(111, 0, 255, 0.8);
+    }
+}
+
+:root.light {
+    --bg: #f9f9f9;
+    --card: rgba(255, 255, 255, 0.7);
+    --text: #111;
+    --muted: #555;
+}
+
+:root.dark {
+    --bg: #0b0b0d;
+    --card: rgba(20, 20, 23, 0.6);
+    --text: #fff;
+    --muted: #aaa;
+}
+
+/* OPTIONAL — Smooth transitions */
+* {
+    transition: background-color 0.35s ease,
+        color 0.35s ease,
+        border-color 0.35s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.animate-slideDown {
+    animation: slideDown 0.4s ease-out;
+}

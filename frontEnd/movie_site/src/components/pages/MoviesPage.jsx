@@ -1,6 +1,8 @@
 import { useGetMoviesQuery } from "../../redux/moviesApi";
 import FilterPanel from "../filters/FilterPanel";
 import MovieCard from "../movies/MovieCard";
+import HeroMovieCard from "../movies/HeroMovieCard";
+import MovieHeroModal from "../movies/MoviesHeroModal";
 
 import { useState } from "react";
 import { FaFilter, FaTable, FaThLarge } from "react-icons/fa";
@@ -10,24 +12,21 @@ import { useSelector } from "react-redux";
 export default function MoviesPage() {
     const { data: movies = [], isLoading } = useGetMoviesQuery({});
     const [query, setQuery] = useState("");
-    const [view, setView] = useState("grid"); // ⭐ NEW → grid | table
+    const [view, setView] = useState("grid");
+    const [activeMovie, setActiveMovie] = useState(null);
 
-    // Redux filter state
     const filterState = useSelector((state) => state.filter);
     const navigate = useNavigate();
-
-    // Toggle filter panel sidebar
     const [openFilter, setOpenFilter] = useState(false);
 
     // FILTER LOGIC
     const filtered = movies.filter((m) => {
         const matchTitle = m.title.toLowerCase().includes(query.toLowerCase());
         const matchGenre =
-            !filterState.selectedGenre ||
-            m.genres.includes(filterState.selectedGenre);
+            !filterState.selectedGenre || m.genres.includes(filterState.selectedGenre);
+
         const matchLanguage =
-            !filterState.selectedLanguage ||
-            m.language === filterState.selectedLanguage;
+            !filterState.selectedLanguage || m.language === filterState.selectedLanguage;
 
         const matchRating =
             !filterState.minRating ||
@@ -36,114 +35,115 @@ export default function MoviesPage() {
         return matchTitle && matchGenre && matchLanguage && matchRating;
     });
 
+    // HERO MOVIES (Top rated)
+    const heroMovies = [...filtered]
+        .sort((a, b) => (b.imdbRating || 0) - (a.imdbRating || 0))
+        .slice(0, 4);
+
     function applyFilters() {
         setOpenFilter(false);
         navigate("/movies#results");
     }
 
-    if (isLoading)
+    if (isLoading) {
         return (
-            <h2 className="text-white p-10 text-xl animate-pulse">Loading movies...</h2>
+            <div className="min-h-[60vh] flex items-center justify-center">
+                <div className="px-8 py-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/15">
+                    <h2 className="text-white text-xl animate-pulse">
+                        Loading movies...
+                    </h2>
+                </div>
+            </div>
         );
+    }
 
     return (
-        <div className="relative pt-24 px-6 text-white">
+        <div className="relative pt-24 pb-16 px-4 sm:px-6 lg:px-10 text-white">
 
-            {/* FLOATING FILTER BUTTON (MOBILE) */}
-            <button
-                className="
-                fixed bottom-8 right-6 z-40 
-                bg-blue-600 hover:bg-blue-700 
-                px-5 py-4 rounded-full 
-                shadow-2xl flex items-center gap-2 
-                text-lg font-bold
-            "
-                onClick={() => setOpenFilter(true)}
-            >
-                <FaFilter size={18} /> Filters
-            </button>
+            {/* Gradient background */}
+            <div className="fixed inset-0 -z-10 bg-gradient-to-br from-[#050509] via-[#050712] to-[#0b0b0d]" />
+            <div className="fixed inset-0 -z-[9] opacity-30 bg-[radial-gradient(circle_at_top,_#3b82f6_0,_transparent_55%)]" />
 
-            {/* SLIDING FILTER SIDEBAR */}
-            <div
-                className={`fixed top-0 right-0 h-full w-80 bg-black/70 backdrop-blur-xl 
-                border-l border-white/20 shadow-xl p-6 z-50
-                transform transition-transform duration-300
-                ${openFilter ? "translate-x-0" : "translate-x-full"}
-            `}
-            >
-                <h2 className="text-2xl font-bold mb-6">Filters</h2>
-
-                <FilterPanel />
-
-                <button
-                    onClick={applyFilters}
-                    className="
-                    w-full mt-6 px-6 py-3 
-                    bg-blue-600 hover:bg-blue-700 
-                    rounded-xl text-lg font-bold
-                "
-                >
-                    Apply Filters ➜
-                </button>
-
-                <button
-                    onClick={() => setOpenFilter(false)}
-                    className="absolute top-4 right-4 text-white text-xl hover:text-red-400"
-                >
-                    ✕
-                </button>
+            {/* HEADER BAR */}
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+                <div>
+                    <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
+                        🎬 All Movies
+                    </h1>
+                    <p className="text-gray-300 mt-2 text-sm sm:text-base">
+                        Browse through{" "}
+                        <span className="text-blue-400 font-semibold">{filtered.length}</span>{" "}
+                        {filtered.length === 1 ? "title" : "titles"} based on your filters.
+                    </p>
+                </div>
             </div>
 
-            {openFilter && (
-                <div
-                    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30"
-                    onClick={() => setOpenFilter(false)}
-                ></div>
+            {/* ⭐ HERO STRIP */}
+            {heroMovies.length > 0 && (
+                <div className="mb-10">
+                    <h2 className="text-lg font-semibold text-gray-200 mb-3">
+                        Spotlight Picks
+                    </h2>
+
+                    <div className="flex gap-5 overflow-x-auto no-scrollbar pb-2">
+                        {heroMovies.map((movie) => (
+                            <HeroMovieCard
+                                key={movie._id}
+                                movie={movie}
+                                onOpen={setActiveMovie}
+                            />
+                        ))}
+                    </div>
+                </div>
             )}
 
-            {/* PAGE TITLE */}
-            <h1 className="text-4xl font-bold mb-4">🎬 All Movies</h1>
-
-            {/* SEARCH & VIEW TOGGLE BAR */}
-            <div className="flex justify-between items-center mb-6 bg-black/40 p-4 rounded-xl border border-white/10">
-
-                {/* Search */}
-                <input
-                    type="text"
-                    placeholder="Search movie..."
-                    className="
-                    px-4 py-3 
-                    w-full max-w-md 
-                    bg-black/40 border border-white/20 rounded-xl 
-                    outline-none text-white
+            {/* SEARCH + VIEW PANEL */}
+            <div
+                className="
+                    flex flex-col md:flex-row md:items-center md:justify-between gap-4
+                    mb-8 px-4 py-4
+                    bg-white/5 backdrop-blur-2xl 
+                    border border-white/15 
+                    rounded-2xl shadow-[0_18px_45px_rgba(0,0,0,0.55)]
                 "
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                />
+            >
+                <div className="flex-1">
+                    <label className="text-xs uppercase tracking-[0.2em] text-gray-400 mb-2 block">
+                        Search
+                    </label>
+                    <input
+                        type="text"
+                        placeholder="Search movie by title..."
+                        className="
+                            px-4 py-3 w-full 
+                            bg-black/40 border border-white/20 rounded-xl 
+                            outline-none text-white
+                            focus:ring-2 focus:ring-blue-500/60 focus:border-blue-400
+                        "
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                    />
+                </div>
 
-                {/* Grid / Table Toggle */}
-                <div className="flex items-center gap-4 ml-6">
-
+                <div className="flex items-center gap-3 bg-black/40 border border-white/15 rounded-2xl px-2 py-1">
                     <button
                         onClick={() => setView("grid")}
-                        className={`p-3 rounded-xl border 
-                        ${view === "grid"
-                                ? "bg-blue-600 border-blue-300"
-                                : "bg-black/50 border-white/20"}
-                        hover:bg-blue-500 transition-all`}
+                        className={`p-2 rounded-xl transition-all ${view === "grid"
+                            ? "bg-blue-500 text-white shadow-lg"
+                            : "text-gray-300 hover:bg-white/10"
+                            }`}
                     >
-                        <FaThLarge />
+                        <FaThLarge size={16} />
                     </button>
 
                     <button
                         onClick={() => setView("table")}
-                        className={`p-3 rounded-xl border 
-                        ${view === "table"
-                                ? "bg-blue-600 border-blue-300"
-                                : "bg-black/50 border-white/20"}
-                        hover:bg-blue-500 transition-all`}
+                        className={`p-2 rounded-xl transition-all ${view === "table"
+                            ? "bg-blue-500 text-white shadow-lg"
+                            : "text-gray-300 hover:bg-white/10"
+                            }`}
                     >
-                        <FaTable />
+                        <FaTable size={16} />
                     </button>
                 </div>
             </div>
@@ -159,7 +159,7 @@ export default function MoviesPage() {
                             <MovieCard key={movie._id} movie={movie} />
                         ))
                     ) : (
-                        <p className="text-gray-400 col-span-full text-lg mt-10">
+                        <p className="text-gray-400 col-span-full text-lg mt-10 text-center">
                             No matching movies found.
                         </p>
                     )}
@@ -168,9 +168,12 @@ export default function MoviesPage() {
 
             {/* TABLE VIEW */}
             {view === "table" && (
-                <div className="overflow-x-auto mt-6">
-                    <table className="w-full bg-black/30 border border-white/10 rounded-xl">
-                        <thead className="bg-white/10 text-left">
+                <div
+                    id="results"
+                    className="overflow-x-auto mt-6 rounded-2xl bg-white/5 backdrop-blur-2xl border border-white/15 shadow-[0_18px_45px_rgba(0,0,0,0.65)]"
+                >
+                    <table className="w-full text-sm">
+                        <thead className="bg-white/10">
                             <tr>
                                 <th className="p-4">Poster</th>
                                 <th className="p-4">Title</th>
@@ -189,20 +192,21 @@ export default function MoviesPage() {
                                     <td className="p-4">
                                         <img
                                             src={movie.posterUrl}
-                                            className="w-16 rounded-lg"
+                                            className="w-16 h-20 object-cover rounded-lg"
                                             alt={movie.title}
                                         />
                                     </td>
                                     <td className="p-4 font-semibold">{movie.title}</td>
                                     <td className="p-4">{movie.year}</td>
-                                    <td className="p-4 text-sm text-gray-300">
-                                        {movie.genres.join(", ")}
-                                    </td>
+                                    <td className="p-4 text-gray-300">{movie.genres.join(", ")}</td>
                                     <td className="p-4 text-yellow-400 font-bold">
                                         ⭐ {movie.imdbRating}
                                     </td>
                                     <td className="p-4">
-                                        <button className="px-3 py-1 bg-blue-600 rounded-lg hover:bg-blue-700">
+                                        <button
+                                            onClick={() => navigate(`/movie/${movie._id}`)}
+                                            className="px-3 py-1.5 bg-blue-600 rounded-lg hover:bg-blue-700"
+                                        >
                                             View
                                         </button>
                                     </td>
@@ -212,6 +216,12 @@ export default function MoviesPage() {
                     </table>
                 </div>
             )}
+
+            {/* ⭐ MODAL */}
+            <MovieHeroModal
+                movie={activeMovie}
+                onClose={() => setActiveMovie(null)}
+            />
         </div>
     );
 }

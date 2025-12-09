@@ -14,6 +14,7 @@ const app = express();
 app.use(
     cors({
         origin: [
+            "http://localhost:5173",
             "http://localhost:5174",
             "https://movie-site-frontend-vn43.onrender.com"
         ],
