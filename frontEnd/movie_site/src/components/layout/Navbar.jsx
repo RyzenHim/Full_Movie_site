@@ -13,7 +13,7 @@ import {
 import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleTheme } from "../../redux/themeSlice";
-import { logout } from "../../redux/authSlice";
+import { logout } from "../../redux/authSlice";   // ✅ FIXED IMPORT
 import { NavLink, Link, useLocation, useNavigate } from "react-router-dom";
 import { useSearchMoviesQuery } from "../../redux/moviesApi";
 
@@ -28,13 +28,14 @@ export default function Navbar() {
     const dispatch = useDispatch();
     const location = useLocation();
     const navigate = useNavigate();
-
     const searchRef = useRef(null);
 
     const theme = useSelector((state) => state.theme.mode);
     const user = useSelector((state) => state.auth.user);
 
-    const { data: results = [] } = useSearchMoviesQuery(query, { skip: !query.trim() });
+    const { data: results = [] } = useSearchMoviesQuery(query, {
+        skip: !query.trim(),
+    });
 
     const [hidden, setHidden] = useState(false);
     let lastScroll = 0;
@@ -57,7 +58,7 @@ export default function Navbar() {
         setSearchOpen(false);
     }, [location.pathname]);
 
-    // Click outside close for search
+    // Close search popup on outside click
     useEffect(() => {
         const close = (e) => {
             if (searchRef.current && !searchRef.current.contains(e.target)) {
@@ -68,25 +69,21 @@ export default function Navbar() {
         return () => document.removeEventListener("mousedown", close);
     }, [searchOpen]);
 
-    // Keyboard navigation
     const handleKeyDown = (e) => {
         if (!results.length) return;
 
         if (e.key === "ArrowDown") {
             setHighlightIndex((prev) => (prev + 1) % results.length);
         }
-
         if (e.key === "ArrowUp") {
             setHighlightIndex((prev) => (prev - 1 + results.length) % results.length);
         }
-
         if (e.key === "Enter") {
-            const movie = results[highlightIndex];
-            if (movie) navigate(`/movie/${movie._id}`);
+            navigate(`/movie/${results[highlightIndex]._id}`);
+            setSearchOpen(false);
         }
     };
 
-    // NavLink Active Style
     const navLinkStyle = ({ isActive }) =>
         `
         px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-all duration-300
@@ -99,12 +96,10 @@ export default function Navbar() {
 
     return (
         <>
-            {/* Dark overlay when search opens */}
             {searchOpen && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"></div>
+                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"></div>
             )}
 
-            {/* NAVBAR */}
             <nav
                 className={`fixed top-0 left-0 w-full h-16 px-6 sm:px-10 z-50
                     flex items-center justify-between
@@ -122,9 +117,8 @@ export default function Navbar() {
                     </h1>
                 </Link>
 
-                {/* DESKTOP MENU */}
+                {/* DESKTOP NAV */}
                 <ul className="hidden md:flex items-center gap-8 text-lg">
-
                     <NavLink to="/" className={navLinkStyle}>Home</NavLink>
 
                     <NavLink to="/trending" className={navLinkStyle}>
@@ -135,79 +129,91 @@ export default function Navbar() {
                         <FaFilm /> Movies
                     </NavLink>
 
-                    {/* SEARCH BUTTON */}
+                    {/* SEARCH BTN */}
                     <button
                         onClick={() => setSearchOpen(true)}
-                        className="flex items-center gap-2 dark:text-gray-300 text-gray-700 
-                                   hover:text-black dark:hover:text-white"
+                        className="flex items-center gap-2 dark:text-gray-300 text-gray-700 hover:text-black dark:hover:text-white"
                     >
                         <FaSearch /> Search
                     </button>
 
-                    {/* PROFILE DROPDOWN */}
-                    <div className="relative">
+                    {/* USER SECTION */}
+                    {!user ? (
                         <button
-                            onClick={() => setAvatarMenu(!avatarMenu)}
-                            className="flex items-center gap-2 dark:text-white text-black"
+                            onClick={() => navigate("/login")}
+                            className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md"
                         >
-                            <FaUserCircle size={26} />
-                            <span>{user?.email || "Guest"}</span>
+                            Sign In
                         </button>
-
-                        {avatarMenu && (
-                            <div className="absolute right-0 top-12 w-52
-                                backdrop-blur-xl dark:bg-black/80 bg-white/80
-                                border dark:border-white/10 border-black/10
-                                shadow-2xl rounded-xl p-4 space-y-3 animate-fadeIn"
+                    ) : (
+                        <div className="relative">
+                            <button
+                                onClick={() => setAvatarMenu(!avatarMenu)}
+                                className="flex items-center gap-2 dark:text-white text-black"
                             >
-                                <NavLink to="/profile" className="flex gap-2 items-center dark:text-white text-black">
-                                    <FaUserCircle /> Profile
-                                </NavLink>
+                                <FaUserCircle size={26} />
+                                <span>{user.name || "User"}</span>
+                            </button>
 
-                                <NavLink to="/watchlist" className="flex gap-2 items-center dark:text-white text-black">
-                                    <FaBookmark /> Watchlist
-                                </NavLink>
-
-                                <button
-                                    onClick={() => dispatch(logout())}
-                                    className="flex gap-2 items-center text-red-500 w-full text-left"
+                            {avatarMenu && (
+                                <div
+                                    className="absolute right-0 top-12 w-56
+                                    backdrop-blur-xl dark:bg-black/80 bg-white/80
+                                    border dark:border-white/10 border-black/10
+                                    shadow-2xl rounded-xl p-4 space-y-4 animate-fadeIn"
                                 >
-                                    <FaSignOutAlt /> Logout
-                                </button>
-                            </div>
-                        )}
-                    </div>
+                                    <NavLink
+                                        to="/watchlist"
+                                        className="flex items-center gap-3 dark:text-white text-black hover:opacity-80"
+                                    >
+                                        <FaBookmark /> Watchlist
+                                    </NavLink>
+
+                                    {/* LOGOUT ---- FIXED */}
+                                    <button
+                                        onClick={() => dispatch(logout())}
+                                        className="flex items-center gap-3 text-red-500 font-semibold w-full text-left hover:opacity-80"
+                                    >
+                                        <FaSignOutAlt /> Logout
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     {/* THEME TOGGLE */}
                     <button
                         onClick={() => dispatch(toggleTheme())}
                         className="p-3 rounded-xl backdrop-blur-xl 
-                                   dark:bg-white/10 bg-black/10
-                                   dark:border-white/20 border-black/20 
-                                   hover:scale-110 transition shadow-md"
+                        dark:bg-white/10 bg-black/10
+                        dark:border-white/20 border-black/20 
+                        hover:scale-110 transition shadow-md"
                     >
-                        {theme === "dark"
-                            ? <FaSun className="text-yellow-400" size={20} />
-                            : <FaMoon className="text-blue-500" size={20} />}
+                        {theme === "dark" ? (
+                            <FaSun className="text-yellow-400" size={20} />
+                        ) : (
+                            <FaMoon className="text-blue-600" size={20} />
+                        )}
                     </button>
                 </ul>
 
-                {/* MOBILE MENU BUTTON */}
-                <button className="md:hidden dark:text-white text-black text-2xl" onClick={() => setOpen(!open)}>
+                {/* MOBILE MENU */}
+                <button
+                    onClick={() => setOpen(!open)}
+                    className="md:hidden dark:text-white text-black text-2xl"
+                >
                     <FaBars />
                 </button>
             </nav>
 
-            {/* SEARCH POPUP — FIXED VERSION */}
+            {/* SEARCH POPUP */}
             {searchOpen && (
                 <div
                     ref={searchRef}
-                    className="
-                        fixed top-24 left-1/2 -translate-x-1/2 w-[420px]
-                        backdrop-blur-xl dark:bg-black/90 bg-white/90
-                        border dark:border-white/10 border-black/10
-                        p-6 rounded-2xl shadow-2xl z-[60] animate-scaleIn
-                    "
+                    className="fixed top-24 left-1/2 -translate-x-1/2 w-[420px]
+                    backdrop-blur-xl dark:bg-black/90 bg-white/90
+                    border dark:border-white/10 border-black/10
+                    p-6 rounded-2xl shadow-2xl z-[60] animate-scaleIn"
                 >
                     <input
                         value={query}
@@ -218,37 +224,38 @@ export default function Navbar() {
                         onKeyDown={handleKeyDown}
                         placeholder="Search movies..."
                         autoFocus
-                        className="
-                            w-full px-4 py-3 rounded-xl 
-                            dark:bg-black/40 bg-white/50
-                            dark:text-white text-black
-                            border dark:border-white/20 border-black/20
-                            focus:border-blue-400 outline-none
-                        "
+                        className="w-full px-4 py-3 rounded-xl
+                        dark:bg-black/40 bg-white/50
+                        dark:text-white text-black
+                        border dark:border-white/20 border-black/20
+                        focus:border-blue-400 outline-none"
                     />
 
-                    {/* SEARCH RESULTS */}
                     {query && results.length > 0 && (
                         <div className="mt-4 max-h-72 overflow-y-auto space-y-2">
                             {results.map((movie, i) => (
                                 <div
                                     key={movie._id}
-                                    onClick={() => navigate(`/movie/${movie._id}`)}
-                                    className={`
-                                        flex items-center gap-4 p-3 rounded-xl cursor-pointer transition
-                                        ${highlightIndex === i ? "bg-blue-600/30" : "hover:dark:bg-white/10 hover:bg-black/10"}
-                                    `}
+                                    onClick={() => {
+                                        navigate(`/movie/${movie._id}`);
+                                        setSearchOpen(false);
+                                    }}
+                                    className={`flex items-center gap-4 p-3 rounded-xl cursor-pointer transition
+                                        ${highlightIndex === i
+                                            ? "bg-blue-600/30"
+                                            : "hover:bg-black/10 dark:hover:bg-white/10"
+                                        }`}
                                 >
                                     <img
                                         src={movie.posterUrl}
-                                        alt={movie.title}
-                                        className="w-14 h-20 object-cover rounded-md"
+                                        className="w-14 h-20 rounded-lg object-cover"
                                     />
 
                                     <div>
                                         <h3 className="dark:text-white text-black font-semibold">
                                             {movie.title}
                                         </h3>
+
                                         <p className="text-gray-400 text-sm line-clamp-2">
                                             {movie.plot}
                                         </p>
@@ -256,12 +263,6 @@ export default function Navbar() {
                                 </div>
                             ))}
                         </div>
-                    )}
-
-                    {query && results.length === 0 && (
-                        <p className="text-gray-500 text-sm mt-4 text-center">
-                            No movies found
-                        </p>
                     )}
                 </div>
             )}

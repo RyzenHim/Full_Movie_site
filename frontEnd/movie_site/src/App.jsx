@@ -25,13 +25,16 @@ import NotFound from "./components/NotFound";
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
+      {/* ROOT LAYOUT (Navbar + global wrappers) */}
       <Route element={<RootLayouts />}>
+        {/* PUBLIC ROUTES */}
         <Route path="/" element={<Home />} />
         <Route path="/movie/:id" element={<MovieDetails />} />
         <Route path="/trending" element={<TrendingPage />} />
         <Route path="/movies" element={<MoviesPage />} />
         <Route path="/search" element={<SearchResults />} />
 
+        {/* PROTECTED ROUTES */}
         <Route element={<ProtectedRoute />}>
           <Route path="/watchlist" element={<Watchlist />} />
           <Route path="/profile" element={<Profile />} />
@@ -39,11 +42,13 @@ const router = createBrowserRouter(
         </Route>
       </Route>
 
+      {/* AUTH PAGES (no navbar) */}
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
       </Route>
 
+      {/* 404 PAGE */}
       <Route path="*" element={<NotFound />} />
     </>
   )

@@ -1,14 +1,19 @@
 import { useState, useEffect, useRef } from "react";
 import { FaRobot, FaTimes, FaTrash, FaSun, FaMoon } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
-import { addToWatchlist } from "../../redux/watchlistSlice";
+import { addMovieToWatchlist } from "../../redux/watchlistSlice";
+
 import ChatMessage from "./ChatMessage";
 import getBotUltimateResponse from "../../utils/getBotUltimateResponse";
 
 export default function ChatbotWidget() {
     const [open, setOpen] = useState(false);
     const [messages, setMessages] = useState([
-        { from: "bot", type: "text", text: "Hi! I’m your Movie Assistant 🤖🎬 Ask me anything about movies." },
+        {
+            from: "bot",
+            type: "text",
+            text: "Hi! I’m your Movie Assistant 🤖🎬 Ask me anything about movies.",
+        },
     ]);
     const [input, setInput] = useState("");
     const [isBotTyping, setIsBotTyping] = useState(false);
@@ -20,8 +25,11 @@ export default function ChatbotWidget() {
 
     const dispatch = useDispatch();
 
+    const user = useSelector((state) => state.auth.user);
     const apiState = useSelector((state) => state.moviesApi);
-    const allMovies = Object.values(apiState.queries || {}).flatMap((q) => q?.data || []);
+    const allMovies = Object.values(apiState.queries || {}).flatMap(
+        (q) => q?.data || []
+    );
 
     useEffect(() => {
         const saved = localStorage.getItem("movie_chat_history");
@@ -57,7 +65,13 @@ export default function ChatbotWidget() {
     }, [messages, isBotTyping, open]);
 
     const clearChat = () => {
-        setMessages([{ from: "bot", type: "text", text: "Chat cleared. Ask me again! 😊" }]);
+        setMessages([
+            {
+                from: "bot",
+                type: "text",
+                text: "Chat cleared. Ask me again! 😊",
+            },
+        ]);
         lastMovieRef.current = null;
         lastGenreRef.current = null;
     };
@@ -110,6 +124,36 @@ export default function ChatbotWidget() {
             ? "bg-black/40 border-white/20 text-white placeholder-gray-400"
             : "bg-gray-100 border-gray-300 text-gray-900 placeholder-gray-500";
 
+    const handleAddToWatchlistFromBot = (movie) => {
+        if (!user?._id) {
+            setMessages((prev) => [
+                ...prev,
+                {
+                    from: "bot",
+                    type: "text",
+                    text: "Please log in to use the watchlist feature 🙂",
+                },
+            ]);
+            return;
+        }
+
+        dispatch(
+            addMovieToWatchlist({
+                userId: user._id,
+                movieId: movie._id,
+            })
+        );
+
+        setMessages((prev) => [
+            ...prev,
+            {
+                from: "bot",
+                type: "text",
+                text: `"${movie.title}" has been added to your watchlist ✅`,
+            },
+        ]);
+    };
+
     return (
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
             {!open && (
@@ -124,34 +168,52 @@ export default function ChatbotWidget() {
             {open && (
                 <div
                     className={`
-            w-[380px] h-[550px]
-            ${containerThemeClasses}
-            backdrop-blur-2xl rounded-3xl shadow-2xl p-4
-            flex flex-col animate-slideUp
-          `}
+                        w-[380px] h-[550px]
+                        ${containerThemeClasses}
+                        backdrop-blur-2xl rounded-3xl shadow-2xl p-4
+                        flex flex-col animate-slideUp
+                    `}
                 >
                     <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                             <FaRobot />
                             <div className="flex flex-col">
-                                <span className="font-semibold text-sm">Movie Assistant</span>
-                                <span className="text-xs opacity-70">Ask about movies, genres & recommendations</span>
+                                <span className="font-semibold text-sm">
+                                    Movie Assistant
+                                </span>
+                                <span className="text-xs opacity-70">
+                                    Ask about movies, genres & recommendations
+                                </span>
                             </div>
                         </div>
 
                         <div className="flex items-center gap-3">
                             <button
-                                onClick={() => setChatTheme((prev) => (prev === "dark" ? "light" : "dark"))}
+                                onClick={() =>
+                                    setChatTheme((prev) =>
+                                        prev === "dark" ? "light" : "dark"
+                                    )
+                                }
                                 className="p-2 rounded-full border border-white/20"
                             >
-                                {chatTheme === "dark" ? <FaSun className="text-yellow-400" /> : <FaMoon className="text-blue-600" />}
+                                {chatTheme === "dark" ? (
+                                    <FaSun className="text-yellow-400" />
+                                ) : (
+                                    <FaMoon className="text-blue-600" />
+                                )}
                             </button>
 
-                            <button onClick={clearChat} className="p-2 rounded-full border border-red-400/50">
+                            <button
+                                onClick={clearChat}
+                                className="p-2 rounded-full border border-red-400/50"
+                            >
                                 <FaTrash className="text-red-400" />
                             </button>
 
-                            <button onClick={() => setOpen(false)} className="p-2 rounded-full border border-white/20">
+                            <button
+                                onClick={() => setOpen(false)}
+                                className="p-2 rounded-full border border-white/20"
+                            >
                                 <FaTimes />
                             </button>
                         </div>
@@ -163,12 +225,14 @@ export default function ChatbotWidget() {
                                 key={i}
                                 msg={msg}
                                 theme={chatTheme}
-                                onAddToWatchlist={(m) => dispatch(addToWatchlist(m))}
+                                onAddToWatchlist={handleAddToWatchlistFromBot}
                             />
                         ))}
 
                         {isBotTyping && (
-                            <div className="text-xs italic opacity-70">{chatTheme === "dark" ? "Assistant is typing..." : "Assistant is typing..."}</div>
+                            <div className="text-xs italic opacity-70">
+                                Assistant is typing...
+                            </div>
                         )}
 
                         <div ref={endRef} />

@@ -100,12 +100,12 @@ export default function MoviesPage() {
             {/* SEARCH + VIEW PANEL */}
             <div
                 className="
-                    flex flex-col md:flex-row md:items-center md:justify-between gap-4
-                    mb-8 px-4 py-4
-                    bg-white/5 backdrop-blur-2xl 
-                    border border-white/15 
-                    rounded-2xl shadow-[0_18px_45px_rgba(0,0,0,0.55)]
-                "
+                flex flex-col md:flex-row md:items-center md:justify-between gap-4
+                mb-8 px-4 py-4
+                bg-white/5 backdrop-blur-2xl 
+                border border-white/15 
+                rounded-2xl shadow-[0_18px_45px_rgba(0,0,0,0.55)]
+            "
             >
                 <div className="flex-1">
                     <label className="text-xs uppercase tracking-[0.2em] text-gray-400 mb-2 block">
@@ -115,11 +115,11 @@ export default function MoviesPage() {
                         type="text"
                         placeholder="Search movie by title..."
                         className="
-                            px-4 py-3 w-full 
-                            bg-black/40 border border-white/20 rounded-xl 
-                            outline-none text-white
-                            focus:ring-2 focus:ring-blue-500/60 focus:border-blue-400
-                        "
+                        px-4 py-3 w-full 
+                        bg-black/40 border border-white/20 rounded-xl 
+                        outline-none text-white
+                        focus:ring-2 focus:ring-blue-500/60 focus:border-blue-400
+                    "
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                     />

@@ -10,6 +10,8 @@ import ChatbotWidget from "../chatbot/ChatbotWidget";
 
 import { useState } from "react";
 
+
+
 export default function Home() {
     const [search, setSearch] = useState("");
     const filterState = useSelector((state) => state.filter);
@@ -37,6 +39,8 @@ export default function Home() {
         "Crime",
         "Fantasy",
     ];
+
+    console.log(import.meta.env.VITE_API_URL)
 
     return (
         <div className="relative w-full text-white bg-[#0B0B0D] pb-20">

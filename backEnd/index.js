@@ -1,15 +1,22 @@
+// index.js (backend)
 
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const dotenv = require("dotenv");
 
-dotenv.config();
 
 const moviesRoutes = require("./routes/moviesRoutes");
+const watchlistRoutes = require("./routes/watchlistRoutes");
+const authRoutes = require("./routes/authRoutes");   // ✅ ADD
+
+// ...
+
+
+dotenv.config();
+
 
 const app = express();
-
 
 app.use(
     cors({
@@ -24,8 +31,7 @@ app.use(
 
 app.use(express.json());
 
-const MONGO_URI =
-    process.env.MONGO_URI;
+const MONGO_URI = process.env.MONGO_URI;
 
 mongoose
     .connect(MONGO_URI)
@@ -40,9 +46,10 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/movies", moviesRoutes);
+app.use("/api/watchlist", watchlistRoutes);   // ✅ MOUNT WATCHLIST API
 
+app.use("/api/auth", authRoutes);
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
 });

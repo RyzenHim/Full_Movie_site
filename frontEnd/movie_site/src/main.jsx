@@ -1,14 +1,28 @@
+// main.jsx
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
-import './App.css'
+import './App.css';
+
+import { Toaster } from "react-hot-toast";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <Provider store={store}>
+  <Provider store={store}>
+    <>
       <App />
-    </Provider>
-  </React.StrictMode>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: "#0b0b0d",
+            color: "#fff",
+            borderRadius: "12px",
+            border: "1px solid rgba(255,255,255,0.1)",
+          },
+        }}
+      />
+    </>
+  </Provider>
 );

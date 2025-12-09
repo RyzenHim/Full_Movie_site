@@ -1,9 +1,10 @@
 import { useParams } from "react-router-dom";
 import { useGetMovieByIdQuery, useGetMoviesQuery } from "../../redux/moviesApi";
-import { FaPlay, FaPlus } from "react-icons/fa";
+import { FaPlay } from "react-icons/fa";
 import SkeletonHero from "../loaders/SkeletonHero";
 import MovieStrip from "../movies/MovieStrip";
 import ReviewsSection from "../sections/ReviewsSection";
+import AddToWatchlistButton from "../watchlist/AddToWatchlistButton";
 
 export default function MovieDetails() {
     const { id } = useParams();
@@ -69,14 +70,16 @@ export default function MovieDetails() {
                             ))}
                         </div>
 
+                        {/* ACTION BUTTONS */}
                         <div className="flex flex-wrap gap-4 mt-6">
+
+                            {/* Watch now button */}
                             <button className="flex items-center gap-2 bg-white text-black px-6 sm:px-8 py-3 rounded-xl text-sm sm:text-lg font-bold shadow hover:bg-gray-200 transition">
                                 <FaPlay /> Watch Now
                             </button>
 
-                            <button className="flex items-center gap-2 bg-black/60 px-6 sm:px-8 py-3 rounded-xl border border-white/30 hover:bg-black/80 text-sm sm:text-lg transition">
-                                <FaPlus /> Add to List
-                            </button>
+                            {/* ⭐ Add to watchlist button (FIXED) */}
+                            <AddToWatchlistButton movie={movie} />
                         </div>
                     </div>
                 </div>
@@ -162,7 +165,7 @@ export default function MovieDetails() {
                 )}
             </div>
 
-            {/* Reviews Section */}
+            {/* Reviews */}
             <div className="px-4 sm:px-8 lg:px-16 pb-16">
                 <ReviewsSection reviews={movie.comments} movieId={movie._id} />
             </div>
